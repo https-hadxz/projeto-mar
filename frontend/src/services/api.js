@@ -1,12 +1,17 @@
+import { auth } from '../stores/auth'
+
 const API_URL = (
   import.meta.env.VITE_API_URL || 'https://projeto-mar.onrender.com'
 ).replace(/\/$/, '')
 
 export async function request(path, options = {}) {
-  const res = await fetch(`${API_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options
-  })
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) }
+
+  if (auth.token) {
+    headers.Authorization = `Bearer ${auth.token}`
+  }
+
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers })
 
   let data = null
   try {
@@ -15,6 +20,12 @@ export async function request(path, options = {}) {
     throw new Error('O servidor não respondeu como esperado. Tente de novo em instantes.')
   }
 
-  if (!res.ok) throw new Error(data.message || `Erro ${res.status}`)
+  if (!res.ok) {
+    if (res.status === 401 && auth.token) {
+      auth.logout()
+    }
+    throw new Error(data.message || `Erro ${res.status}`)
+  }
+
   return data
 }
