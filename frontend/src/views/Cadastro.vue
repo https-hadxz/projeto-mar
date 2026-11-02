@@ -6,10 +6,10 @@
       <p>Explore o oceano e compartilhe conhecimento.</p>
 
       <form @submit.prevent="cadastrar">
-        <label for="nome">Nome</label>
+        <label for="username">Nome de usuário</label>
         <input
-          id="nome"
-          v-model="nome"
+          id="username"
+          v-model="username"
           type="text"
           placeholder="Seu nome"
           required
@@ -24,17 +24,29 @@
           required
         />
 
-        <label for="senha">Senha</label>
+        <label for="age">Idade</label>
         <input
-          id="senha"
-          v-model="senha"
+          id="age"
+          v-model.number="age"
+          type="number"
+          min="1"
+          max="120"
+          required
+        />
+
+        <label for="password">Senha</label>
+        <input
+          id="password"
+          v-model="password"
           type="password"
           placeholder="Crie uma senha"
           minlength="8"
           required
         />
 
-        <button type="submit">Criar conta</button>
+        <button type="submit" :disabled="carregando">
+          {{ carregando ? 'Enviando...' : 'Criar conta' }}
+        </button>
         <p v-if="mensagem" role="status">{{ mensagem }}</p>
       </form>
     </section>
@@ -43,14 +55,33 @@
 
 <script setup>
 import { ref } from 'vue'
+import { request } from '../services/api'
 
-const nome = ref('')
+const username = ref('')
 const email = ref('')
-const senha = ref('')
+const age = ref(null)
+const password = ref('')
 const mensagem = ref('')
+const carregando = ref(false)
 
-function cadastrar() {
-  mensagem.value = `Formulário funcionando para ${nome.value}!`
+async function cadastrar() {
+  carregando.value = true
+  mensagem.value = ''
+  try {
+    const data = await request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+        age: age.value,
+        password: password.value
+      })
+    })
+    mensagem.value = data.message
+  } catch (e) {
+    mensagem.value = e.message
+  }
+  carregando.value = false
 }
 </script>
 
@@ -112,5 +143,10 @@ button {
 
 button:hover {
   background: #05636d;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>
