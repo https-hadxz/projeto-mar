@@ -4,13 +4,50 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
+const articleRoutes = require("./routes/articles");
 
 const app = express();
 
-app.use(cors());
+if (!process.env.JWT_SECRET) {
+  console.warn("ATENÇÃO: a variável JWT_SECRET não está definida.");
+}
+
+const allowedOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((url) => url.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (
+        !origin ||
+        allowedOrigins.length === 0 ||
+        allowedOrigins.includes(origin) ||
+        origin === "http://localhost:5173"
+      ) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origem não permitida pelo CORS."));
+    }
+  })
+);
+
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "Backend do App Mar funcionando!"
+  });
+});
+
 app.use("/api/auth", authRoutes);
+app.use("/api/articles", articleRoutes);
+
+app.use((err, req, res, next) => {
+  console.error(err.message);
+  res.status(err.status || 500).json({ message: "Erro na requisição." });
+});
 
 async function startServer() {
   try {
@@ -19,12 +56,6 @@ async function startServer() {
     await mongoose.connect(process.env.MONGODB_URI);
 
     console.log("MongoDB conectado!");
-
-    app.get("/", (req, res) => {
-      res.json({
-        message: "Backend do App Mar funcionando!"
-      });
-    });
 
     const PORT = process.env.PORT || 3000;
 
