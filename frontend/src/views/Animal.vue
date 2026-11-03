@@ -78,7 +78,9 @@ async function removerModeracao() {
 
     <h1>{{ animal.name }}</h1>
     <p class="muted" style="font-size: 14px">
-      Cadastrado por {{ animal.owner?.username || 'desconhecido' }} em
+      Cadastrado por
+      <RouterLink v-if="animal.owner" :to="`/u/${animal.owner.id}`">{{ animal.owner.username }}</RouterLink>
+      <span v-else>desconhecido</span> em
       {{ formatarData(animal.createdAt) }}
     </p>
 

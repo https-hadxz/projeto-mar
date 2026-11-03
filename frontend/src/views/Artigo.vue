@@ -57,7 +57,9 @@ async function excluir() {
   <article v-else-if="artigo" class="card">
     <h1>{{ artigo.title }}</h1>
     <p class="muted" style="font-size: 14px">
-      Criado por {{ artigo.author?.username || 'desconhecido' }} em
+      Criado por
+<RouterLink v-if="artigo.author" :to="`/u/${artigo.author.id}`">{{ artigo.author.username }}</RouterLink>
+<span v-else>desconhecido</span> em
       {{ formatarData(artigo.createdAt) }}
       <span v-if="artigo.lastEditedBy">
         · última edição por {{ artigo.lastEditedBy }} em
