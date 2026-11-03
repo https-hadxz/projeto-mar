@@ -16,6 +16,12 @@ function publicUser(user) {
     email: user.email,
     age: user.age,
     role: user.role,
+    bio: user.bio || "",
+    hasAvatar: !!user.hasAvatar,
+    hasBanner: !!user.hasBanner,
+    version: user.profileUpdatedAt
+      ? new Date(user.profileUpdatedAt).getTime()
+      : 0,
     createdAt: user.createdAt
   };
 }

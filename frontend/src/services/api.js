@@ -8,6 +8,14 @@ export function fotoUrl(id, versao = '') {
   return `${API_URL}/api/animals/${id}/photo?v=${encodeURIComponent(versao)}`
 }
 
+export function avatarUrl(id, versao = 0) {
+  return `${API_URL}/api/users/${id}/avatar?v=${encodeURIComponent(versao)}`
+}
+
+export function bannerUrl(id, versao = 0) {
+  return `${API_URL}/api/users/${id}/banner?v=${encodeURIComponent(versao)}`
+}
+
 export async function request(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) }
 

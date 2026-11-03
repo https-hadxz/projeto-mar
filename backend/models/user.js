@@ -48,6 +48,24 @@ const userSchema = new mongoose.Schema({
     default: null
   },
 
+  // Perfil
+  bio: {
+    type: String,
+    trim: true,
+    maxlength: 200,
+    default: ""
+  },
+
+  hasAvatar: { type: Boolean, default: false },
+  avatarData: { type: Buffer, select: false },
+  avatarType: { type: String, select: false },
+
+  hasBanner: { type: Boolean, default: false },
+  bannerData: { type: Buffer, select: false },
+  bannerType: { type: String, select: false },
+
+  profileUpdatedAt: { type: Date, default: Date.now },
+
   createdAt: {
     type: Date,
     default: Date.now

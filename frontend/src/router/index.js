@@ -38,12 +38,19 @@ const router = createRouter({
 
     { path: '/login', name: 'login', component: () => import('../views/Login.vue') },
     { path: '/cadastro', name: 'cadastro', component: () => import('../views/Cadastro.vue') },
+
+    { path: '/u/:id', name: 'usuario', component: () => import('../views/Usuario.vue') },
     {
-      path: '/perfil',
-      name: 'perfil',
-      component: () => import('../views/Perfil.vue'),
+      path: '/perfil/editar',
+      name: 'editar-perfil',
+      component: () => import('../views/EditarPerfil.vue'),
       meta: { requiresAuth: true }
     },
+    {
+      path: '/perfil',
+      redirect: () => (auth.user ? `/u/${auth.user.id}` : '/login')
+    },
+
     {
       path: '/moderacao',
       name: 'moderacao',

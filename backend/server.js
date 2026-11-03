@@ -8,6 +8,8 @@ const articleRoutes = require("./routes/articles");
 const animalRoutes = require("./routes/animals");
 const reportRoutes = require("./routes/reports");
 const adminRoutes = require("./routes/admin");
+const userRoutes = require("./routes/users");
+const feedRoutes = require("./routes/feed");
 const {
   loginLimiter,
   registerLimiter,
@@ -59,6 +61,8 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/articles", writeLimiter, articleRoutes);
 app.use("/api/animals", writeLimiter, animalRoutes);
+app.use("/api/users", writeLimiter, userRoutes);
+app.use("/api/feed", feedRoutes);
 app.use("/api/reports", reportLimiter, reportRoutes);
 app.use("/api/admin", adminRoutes);
 
