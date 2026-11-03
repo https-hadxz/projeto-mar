@@ -25,7 +25,7 @@ export async function request(path, options = {}) {
   }
 
   if (!res.ok) {
-    if (res.status === 401 && auth.token) {
+    if ((res.status === 401 || data.code === 'banned') && auth.token) {
       auth.logout()
     }
     throw new Error(data.message || `Erro ${res.status}`)

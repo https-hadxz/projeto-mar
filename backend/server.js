@@ -6,8 +6,19 @@ require("dotenv").config();
 const authRoutes = require("./routes/auth");
 const articleRoutes = require("./routes/articles");
 const animalRoutes = require("./routes/animals");
+const reportRoutes = require("./routes/reports");
+const adminRoutes = require("./routes/admin");
+const {
+  loginLimiter,
+  registerLimiter,
+  reportLimiter,
+  writeLimiter
+} = require("./middleware/limiters");
 
 const app = express();
+
+// O Render fica atrás de um proxy: sem isso todos os acessos pareceriam o mesmo IP
+app.set("trust proxy", 1);
 
 if (!process.env.JWT_SECRET) {
   console.warn("ATENÇÃO: a variável JWT_SECRET não está definida.");
@@ -42,9 +53,14 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/api/auth/login", loginLimiter);
+app.use("/api/auth/register", registerLimiter);
 app.use("/api/auth", authRoutes);
-app.use("/api/articles", articleRoutes);
-app.use("/api/animals", animalRoutes);
+
+app.use("/api/articles", writeLimiter, articleRoutes);
+app.use("/api/animals", writeLimiter, animalRoutes);
+app.use("/api/reports", reportLimiter, reportRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((err, req, res, next) => {
   if (err.type === "entity.too.large") {

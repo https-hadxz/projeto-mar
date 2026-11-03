@@ -43,6 +43,12 @@ const router = createRouter({
       name: 'perfil',
       component: () => import('../views/Perfil.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/moderacao',
+      name: 'moderacao',
+      component: () => import('../views/Moderacao.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     }
   ]
 })
@@ -50,6 +56,9 @@ const router = createRouter({
 router.beforeEach((to) => {
   if (to.meta.requiresAuth && !auth.token) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  if (to.meta.requiresAdmin && auth.user?.role !== 'admin') {
+    return { name: 'inicio' }
   }
 })
 

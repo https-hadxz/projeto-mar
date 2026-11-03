@@ -5,6 +5,7 @@ import { request, fotoUrl } from '../services/api'
 import { auth } from '../stores/auth'
 import { formatarData } from '../utils/format'
 import MapaLocal from '../components/MapaLocal.vue'
+import ReportarConteudo from '../components/ReportarConteudo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -26,6 +27,9 @@ const ehDono = computed(
     String(animal.value.owner?.id) === String(auth.user.id)
 )
 
+const ehAdmin = computed(() => auth.user?.role === 'admin')
+const podeDenunciar = computed(() => animal.value && auth.user && !ehDono.value)
+
 const temLocal = computed(
   () =>
     animal.value &&
@@ -46,6 +50,16 @@ async function excluir() {
   if (!confirm(`Excluir "${animal.value.name}"? Essa ação não pode ser desfeita.`)) return
   try {
     await request(`/api/animals/${route.params.id}`, { method: 'DELETE' })
+    router.push({ path: '/animais', query: { msg: 'excluido' } })
+  } catch (e) {
+    erro.value = e.message
+  }
+}
+
+async function removerModeracao() {
+  if (!confirm(`Remover "${animal.value.name}" pela moderação? Essa ação não pode ser desfeita.`)) return
+  try {
+    await request(`/api/admin/content/animal/${route.params.id}`, { method: 'DELETE' })
     router.push({ path: '/animais', query: { msg: 'excluido' } })
   } catch (e) {
     erro.value = e.message
@@ -95,6 +109,16 @@ async function excluir() {
     <div v-if="ehDono" class="row" style="margin-top: 24px">
       <RouterLink :to="`/animais/${animal.id}/editar`" class="btn">Editar</RouterLink>
       <button class="btn btn-danger" @click="excluir">Excluir</button>
+    </div>
+
+    <div v-if="ehAdmin && !ehDono" class="row" style="margin-top: 24px">
+      <button class="btn btn-danger" @click="removerModeracao">
+        Remover (moderação)
+      </button>
+    </div>
+
+    <div v-if="podeDenunciar" style="margin-top: 20px">
+      <ReportarConteudo tipo="animal" :alvo-id="String(animal.id)" />
     </div>
 
     <p style="margin-top: 20px">

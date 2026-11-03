@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { request } from '../services/api'
 import { auth } from '../stores/auth'
 import { formatarData } from '../utils/format'
+import ReportarConteudo from '../components/ReportarConteudo.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -16,7 +17,15 @@ const podeExcluir = computed(
   () =>
     artigo.value &&
     auth.user &&
-    (auth.user.id === artigo.value.author?.id || auth.user.role === 'admin')
+    (String(auth.user.id) === String(artigo.value.author?.id) ||
+      auth.user.role === 'admin')
+)
+
+const podeDenunciar = computed(
+  () =>
+    artigo.value &&
+    auth.user &&
+    String(auth.user.id) !== String(artigo.value.author?.id)
 )
 
 onMounted(async () => {
@@ -75,10 +84,18 @@ async function excluir() {
       <RouterLink v-if="auth.token" :to="`/editar/${artigo.id}`" class="btn">
         Editar
       </RouterLink>
-      <RouterLink v-else :to="{ name: 'login', query: { redirect: route.fullPath } }" class="btn btn-outline">
+      <RouterLink
+        v-else
+        :to="{ name: 'login', query: { redirect: route.fullPath } }"
+        class="btn btn-outline"
+      >
         Entre para editar
       </RouterLink>
       <button v-if="podeExcluir" class="btn btn-danger" @click="excluir">Excluir</button>
+    </div>
+
+    <div v-if="podeDenunciar" style="margin-top: 20px">
+      <ReportarConteudo tipo="article" :alvo-id="String(artigo.id)" />
     </div>
 
     <details v-if="artigo.revisions.length" style="margin-top: 24px">

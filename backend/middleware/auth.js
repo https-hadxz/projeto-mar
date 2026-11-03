@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const User = require("../models/user");
 
-function auth(req, res, next) {
+async function auth(req, res, next) {
   const header = req.headers.authorization || "";
   const [type, token] = header.split(" ");
 
@@ -8,18 +10,51 @@ function auth(req, res, next) {
     return res.status(401).json({ message: "Faça login para continuar." });
   }
 
+  let payload;
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = {
-      id: payload.id,
-      username: payload.username,
-      role: payload.role
-    };
-    next();
+    payload = jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {
     return res
       .status(401)
       .json({ message: "Sessão expirada. Faça login novamente." });
+  }
+
+  try {
+    if (!mongoose.isValidObjectId(payload.id)) {
+      return res
+        .status(401)
+        .json({ message: "Sessão inválida. Faça login novamente." });
+    }
+
+    const user = await User.findById(payload.id).select(
+      "username role banned banReason"
+    );
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Conta não encontrada. Faça login novamente." });
+    }
+
+    if (user.banned) {
+      return res.status(403).json({
+        code: "banned",
+        message:
+          "Sua conta foi suspensa." +
+          (user.banReason ? ` Motivo: ${user.banReason}` : "")
+      });
+    }
+
+    req.user = {
+      id: String(user._id),
+      username: user.username,
+      role: user.role
+    };
+
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao verificar sua sessão." });
   }
 }
 

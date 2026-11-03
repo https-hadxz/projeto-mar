@@ -28,6 +28,26 @@ const userSchema = new mongoose.Schema({
     default: "user"
   },
 
+  banned: {
+    type: Boolean,
+    default: false
+  },
+
+  banReason: {
+    type: String,
+    default: ""
+  },
+
+  failedLoginAttempts: {
+    type: Number,
+    default: 0
+  },
+
+  lockUntil: {
+    type: Date,
+    default: null
+  },
+
   createdAt: {
     type: Date,
     default: Date.now

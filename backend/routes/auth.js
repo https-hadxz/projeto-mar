@@ -6,6 +6,9 @@ const auth = require("../middleware/auth");
 
 const router = express.Router();
 
+const MAX_TENTATIVAS = 5;
+const BLOQUEIO_MINUTOS = 15;
+
 function publicUser(user) {
   return {
     id: user._id,
@@ -77,16 +80,73 @@ router.post("/login", async (req, res) => {
       email: String(email).trim().toLowerCase()
     });
 
+    // Conta bloqueada por tentativas erradas?
+    if (user && user.lockUntil) {
+      if (user.lockUntil > new Date()) {
+        const minutos = Math.ceil((user.lockUntil - Date.now()) / 60000);
+        return res.status(429).json({
+          message: `Muitas tentativas incorretas. Tente novamente em ${minutos} minuto(s).`
+        });
+      }
+
+      // O bloqueio já acabou: zera o contador
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { lockUntil: null, failedLoginAttempts: 0 } }
+      );
+      user.lockUntil = null;
+      user.failedLoginAttempts = 0;
+    }
+
     const senhaCorreta =
       user && (await bcrypt.compare(String(password), user.password));
 
     if (!senhaCorreta) {
+      if (user) {
+        const atualizado = await User.findOneAndUpdate(
+          { _id: user._id },
+          { $inc: { failedLoginAttempts: 1 } },
+          { returnDocument: "after" }
+        );
+
+        if (atualizado && atualizado.failedLoginAttempts >= MAX_TENTATIVAS) {
+          await User.updateOne(
+            { _id: user._id },
+            {
+              $set: {
+                lockUntil: new Date(Date.now() + BLOQUEIO_MINUTOS * 60000),
+                failedLoginAttempts: 0
+              }
+            }
+          );
+          return res.status(429).json({
+            message: `Muitas tentativas incorretas. Login bloqueado por ${BLOQUEIO_MINUTOS} minutos.`
+          });
+        }
+      }
+
       return res.status(401).json({ message: "E-mail ou senha incorretos." });
+    }
+
+    if (user.banned) {
+      return res.status(403).json({
+        code: "banned",
+        message:
+          "Sua conta foi suspensa." +
+          (user.banReason ? ` Motivo: ${user.banReason}` : "")
+      });
     }
 
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET não está definida no servidor.");
       return res.status(500).json({ message: "Erro de configuração do servidor." });
+    }
+
+    if (user.failedLoginAttempts > 0) {
+      await User.updateOne(
+        { _id: user._id },
+        { $set: { failedLoginAttempts: 0 } }
+      );
     }
 
     const token = jwt.sign(
