@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const authRoutes = require("./routes/auth");
 const articleRoutes = require("./routes/articles");
+const animalRoutes = require("./routes/animals");
 
 const app = express();
 
@@ -33,7 +34,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "3mb" }));
 
 app.get("/", (req, res) => {
   res.json({
@@ -43,8 +44,14 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
+app.use("/api/animals", animalRoutes);
 
 app.use((err, req, res, next) => {
+  if (err.type === "entity.too.large") {
+    return res
+      .status(413)
+      .json({ message: "Imagem muito grande. Use uma foto menor." });
+  }
   console.error(err.message);
   res.status(err.status || 500).json({ message: "Erro na requisição." });
 });

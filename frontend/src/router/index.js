@@ -20,6 +20,22 @@ const router = createRouter({
       component: () => import('../views/EditorArtigo.vue'),
       meta: { requiresAuth: true }
     },
+
+    { path: '/animais', name: 'animais', component: () => import('../views/Animais.vue') },
+    {
+      path: '/animais/novo',
+      name: 'novo-animal',
+      component: () => import('../views/EditorAnimal.vue'),
+      meta: { requiresAuth: true }
+    },
+    { path: '/animais/:id', name: 'animal', component: () => import('../views/Animal.vue') },
+    {
+      path: '/animais/:id/editar',
+      name: 'editar-animal',
+      component: () => import('../views/EditorAnimal.vue'),
+      meta: { requiresAuth: true }
+    },
+
     { path: '/login', name: 'login', component: () => import('../views/Login.vue') },
     { path: '/cadastro', name: 'cadastro', component: () => import('../views/Cadastro.vue') },
     {

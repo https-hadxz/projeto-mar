@@ -16,6 +16,7 @@ function sair() {
       <RouterLink to="/" class="brand">🌊 Projeto Mar</RouterLink>
       <nav>
         <RouterLink to="/explorar">Explorar</RouterLink>
+        <RouterLink to="/animais">Animais</RouterLink>
         <template v-if="auth.token">
           <RouterLink to="/novo">Novo artigo</RouterLink>
           <RouterLink to="/perfil">{{ auth.user?.username }}</RouterLink>
