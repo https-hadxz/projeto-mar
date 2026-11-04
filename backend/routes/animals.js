@@ -40,9 +40,11 @@ function validate(body) {
   const description = String(body.description || "").trim();
   const locationName = String(body.locationName || "").trim();
 
-  if (!name || !species || !description) {
-    return { error: "Preencha nome, espécie e descrição." };
-  }
+  if (!name || !species || !breed || !description) {
+  return {
+    error: "Preencha nome, espécie, raça e descrição."
+  };
+}
   if (name.length > 80 || species.length > 80 || breed.length > 80) {
     return { error: "Nome, espécie e raça podem ter no máximo 80 caracteres." };
   }
@@ -52,6 +54,22 @@ function validate(body) {
   if (locationName.length > 120) {
     return { error: "O nome do local pode ter no máximo 120 caracteres." };
   }
+  const scientificName = String(body.scientificName || "").trim();
+const family = String(body.family || "").trim();
+
+const averageSize = String(body.averageSize || "").trim();
+const averageWeight = String(body.averageWeight || "").trim();
+
+const diet = String(body.diet || "").trim();
+const habitat = String(body.habitat || "").trim();
+const distribution = String(body.distribution || "").trim();
+const reproduction = String(body.reproduction || "").trim();
+const behavior = String(body.behavior || "").trim();
+const ecologicalRole = String(body.ecologicalRole || "").trim();
+
+const conservationStatus = String(body.conservationStatus || "").trim();
+const threats = String(body.threats || "").trim();
+const curiosities = String(body.curiosities || "").trim();
 
   let age = null;
   if (!vazio(body.age)) {
@@ -60,7 +78,35 @@ function validate(body) {
       return { error: "Idade inválida. Informe um número entre 0 e 500." };
     }
   }
+let lifespan = null;
 
+if (!vazio(body.lifespan)) {
+  lifespan = Number(body.lifespan);
+
+  if (!Number.isFinite(lifespan) || lifespan < 0 || lifespan > 500) {
+    return { error: "Expectativa de vida inválida." };
+  }
+}
+
+const limites = [
+  [scientificName, 120],
+  [family, 100],
+  [averageSize, 100],
+  [averageWeight, 100],
+  [diet, 1000],
+  [habitat, 1000],
+  [distribution, 1000],
+  [reproduction, 1000],
+  [behavior, 1000],
+  [ecologicalRole, 1000],
+  [conservationStatus, 100],
+  [threats, 1000],
+  [curiosities, 1500]
+];
+
+if (limites.some(([valor, limite]) => valor.length > limite)) {
+  return { error: "Um dos campos informados ultrapassou o limite de caracteres." };
+}
   let latitude = null;
   let longitude = null;
   if (!vazio(body.latitude) || !vazio(body.longitude)) {
@@ -81,16 +127,33 @@ function validate(body) {
     }
   }
 
-  return {
-    name,
-    species,
-    breed,
-    description,
-    locationName,
-    age,
-    latitude,
-    longitude
-  };
+return {
+  name,
+  species,
+  breed,
+  description,
+  locationName,
+  age,
+  latitude,
+  longitude,
+
+  scientificName,
+  family,
+  lifespan,
+  averageSize,
+  averageWeight,
+
+  diet,
+  habitat,
+  distribution,
+  reproduction,
+  behavior,
+  ecologicalRole,
+
+  conservationStatus,
+  threats,
+  curiosities
+};
 }
 
 // Listar / buscar (qualquer pessoa, mesmo sem login)
@@ -130,7 +193,12 @@ router.get("/", async (req, res) => {
         locationName: a.locationName,
         hasPhoto: a.hasPhoto,
         owner: a.owner ? a.owner.username : null,
-        updatedAt: a.updatedAt
+        updatedAt: a.updatedAt,
+        scientificName: a.scientificName,
+        family: a.family,
+        lifespan: a.lifespan,
+        averageSize: a.averageSize,
+        averageWeight: a.averageWeight,
       }))
     );
   } catch (error) {
@@ -186,7 +254,21 @@ router.get("/:id", async (req, res) => {
       hasPhoto: a.hasPhoto,
       owner: a.owner ? { id: a.owner._id, username: a.owner.username } : null,
       createdAt: a.createdAt,
-      updatedAt: a.updatedAt
+      updatedAt: a.updatedAt,
+      scientificName: a.scientificName,
+      family: a.family,
+      lifespan: a.lifespan,
+      averageSize: a.averageSize,
+      averageWeight: a.averageWeight,
+      diet: a.diet,
+      habitat: a.habitat,
+      distribution: a.distribution,
+      reproduction: a.reproduction,
+      behavior: a.behavior,
+      ecologicalRole: a.ecologicalRole,
+      conservationStatus: a.conservationStatus,
+      threats: a.threats,
+      curiosities: a.curiosities,
     });
   } catch (error) {
     console.error(error);
@@ -199,6 +281,21 @@ router.post("/", auth, async (req, res) => {
   try {
     const data = validate(req.body);
     if (data.error) return res.status(400).json({ message: data.error });
+
+    const possuiFotoNova = !!req.body.photo;
+const removendoFoto = req.body.removePhoto === true;
+
+if (!possuiFotoNova && (removendoFoto || !animal.hasPhoto)) {
+  return res.status(400).json({
+    message: "O animal precisa ter uma fotografia."
+  });
+}
+
+    if (!req.body.photo) {
+  return res.status(400).json({
+    message: "A fotografia do animal é obrigatória."
+  });
+}
 
     const animal = new Animal({ ...data, owner: req.user.id });
 

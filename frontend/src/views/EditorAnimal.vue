@@ -209,6 +209,7 @@ async function salvar() {
     salvando.value = false
   }
 }
+</script>
 
 <template>
   <h1>{{ editando ? 'Editar animal' : 'Cadastrar animal' }}</h1>
@@ -423,19 +424,6 @@ async function salvar() {
   maxlength="1500"
   placeholder="Compartilhe fatos interessantes sobre esse animal."
 ></textarea>
-
-
-
-    ></textarea>
-
-    <label for="foto">Foto (opcional)</label>
-    <input id="foto" type="file" accept="image/*" @change="escolherFoto" />
-    <p v-if="processandoFoto" class="muted">Preparando a foto…</p>
-    <img v-if="previa" :src="previa" alt="Prévia da foto" class="foto-grande" />
-    <label v-if="fotoAtual && !fotoNova" class="row">
-      <input v-model="removerFoto" type="checkbox" style="width: auto" />
-      Remover a foto atual
-    </label>
 
     <label for="local">Nome do local (opcional)</label>
     <input

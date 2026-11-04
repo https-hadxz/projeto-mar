@@ -4,15 +4,47 @@ const animalSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 80 },
     species: { type: String, required: true, trim: true, maxlength: 80 },
-    breed: { type: String, trim: true, maxlength: 80, default: "" },
+    breed: { type: String, required: true, trim: true, maxlength: 80 },
     age: { type: Number, min: 0, max: 500, default: null },
-    description: { type: String, required: true, trim: true, maxlength: 2000 },
+
+    // Informações científicas
+    scientificName: { type: String, trim: true, maxlength: 120, default: "" },
+    family: { type: String, trim: true, maxlength: 100, default: "" },
+
+    // Características
+    lifespan: { type: Number, min: 0, max: 500, default: null },
+    averageSize: { type: String, trim: true, maxlength: 100, default: "" },
+    averageWeight: { type: String, trim: true, maxlength: 100, default: "" },
+
+    // Informações biológicas e ecológicas
+    diet: { type: String, trim: true, maxlength: 1000, default: "" },
+    habitat: { type: String, trim: true, maxlength: 1000, default: "" },
+    distribution: { type: String, trim: true, maxlength: 1000, default: "" },
+    reproduction: { type: String, trim: true, maxlength: 1000, default: "" },
+    behavior: { type: String, trim: true, maxlength: 1000, default: "" },
+    ecologicalRole: { type: String, trim: true, maxlength: 1000, default: "" },
+
+    // Conservação
+    conservationStatus: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      default: ""
+    },
+    threats: { type: String, trim: true, maxlength: 1000, default: "" },
+    curiosities: { type: String, trim: true, maxlength: 1500, default: "" },
+
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 2000
+    },
 
     locationName: { type: String, trim: true, maxlength: 120, default: "" },
     latitude: { type: Number, min: -90, max: 90, default: null },
     longitude: { type: Number, min: -180, max: 180, default: null },
 
-    // A foto fica no próprio banco (select: false = não vem nas listagens)
     hasPhoto: { type: Boolean, default: false },
     photoData: { type: Buffer, select: false },
     photoType: { type: String, select: false },
