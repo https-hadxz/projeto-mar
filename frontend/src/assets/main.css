@@ -26,6 +26,30 @@
   --sombra: 0 18px 40px -22px rgba(1, 22, 43, 0.45);
 }
 
+/* =================================
+   TEMA ESCURO
+================================= */
+
+:root[data-theme='escuro'] {
+  --abismo: #e5edf5;
+  --corrente: #8bbbd9;
+  --bruma: #527d9f;
+  --poeira: #a9bbce;
+  --veu: #d3e0eb;
+  --espuma: #101d2b;
+  --areia: #273442;
+  --fita: rgba(201, 178, 160, 0.45);
+  --teal: #78c4d8;
+
+  --bg: #101d2b;
+  --text: #e5edf5;
+  --muted: #aab9c8;
+  --border: #35495c;
+  --danger: #ff8585;
+
+  --sombra: 0 18px 40px -22px rgba(0, 0, 0, 0.75);
+}
+
 *,
 *::before,
 *::after {
@@ -861,4 +885,108 @@ h3,
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.1;
+}
+
+/* =================================
+   PERSONALIZAÇÃO DO TEMA ESCURO
+================================= */
+
+/* Fundo geral */
+:root[data-theme='escuro'] body {
+  background: linear-gradient(
+    180deg,
+    #17293b 0,
+    var(--espuma) 460px
+  );
+  background-color: var(--espuma);
+  color: var(--text);
+}
+
+/* Títulos */
+:root[data-theme='escuro'] h1,
+:root[data-theme='escuro'] h2,
+:root[data-theme='escuro'] h3 {
+  color: var(--abismo);
+}
+
+/* Cartões */
+:root[data-theme='escuro'] .card,
+:root[data-theme='escuro'] .post,
+:root[data-theme='escuro'] .polaroid,
+:root[data-theme='escuro'] .menu-novo {
+  background: #1c2c3b;
+  color: var(--text);
+}
+
+/* Formulários */
+:root[data-theme='escuro'] input,
+:root[data-theme='escuro'] textarea,
+:root[data-theme='escuro'] select {
+  background: #192a39;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Campos de envio de arquivos */
+:root[data-theme='escuro'] input[type='file'] {
+  background: #192a39;
+  color: var(--text);
+}
+
+/* Links e textos */
+:root[data-theme='escuro'] .post-autor,
+:root[data-theme='escuro'] .menu-novo a,
+:root[data-theme='escuro'] .polaroid {
+  color: var(--text);
+}
+
+/* Polaroids e espaços vazios */
+:root[data-theme='escuro'] .polaroid-vazio,
+:root[data-theme='escuro'] .animal-foto-vazia {
+  background: linear-gradient(160deg, #293e50, #1c2c3b);
+}
+
+/* Bordas */
+:root[data-theme='escuro'] .post-rodape {
+  border-color: var(--border);
+}
+
+/* Abas e etiquetas */
+:root[data-theme='escuro'] .menu-novo a:hover {
+  background: #293e50;
+}
+
+/* Botão de mudança de tema */
+.botao-tema {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--border);
+  border-radius: 50%;
+
+  background: var(--espuma);
+  color: var(--text);
+
+  font-size: 20px;
+  cursor: pointer;
+
+  box-shadow: var(--sombra);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.botao-tema:hover {
+  transform: scale(1.08);
+}
+
+.botao-tema:focus-visible {
+  outline: 3px solid var(--bruma);
+  outline-offset: 3px;
 }

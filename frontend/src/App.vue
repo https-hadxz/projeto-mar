@@ -10,6 +10,21 @@ const router = useRouter()
 const route = useRoute()
 const menuAberto = ref(false)
 
+// Tema visual do site
+const tema = ref('claro')
+
+function aplicarTema(novoTema) {
+  tema.value = novoTema
+
+  document.documentElement.setAttribute('data-theme', novoTema)
+
+  localStorage.setItem('tema-projeto-mar', novoTema)
+}
+
+function alternarTema() {
+  aplicarTema(tema.value === 'claro' ? 'escuro' : 'claro')
+}
+
 function fecharMenu() {
   menuAberto.value = false
 }
@@ -29,6 +44,11 @@ watch(() => route.fullPath, fecharMenu)
 onMounted(async () => {
   window.addEventListener('keydown', aoTeclar)
 
+  // Recupera o tema salvo
+  const temaSalvo = localStorage.getItem('tema-projeto-mar') || 'claro'
+
+  aplicarTema(temaSalvo)
+
   if (!auth.token) return
   try {
     const data = await request('/api/auth/me')
@@ -45,6 +65,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', aoTeclar))
   <RouterLink to="/" class="marca">
     <span aria-hidden="true">🌊</span> Projeto Mar
   </RouterLink>
+
+  <button
+  type="button"
+  class="botao-tema"
+  @click="alternarTema"
+  :aria-label="tema === 'claro' ? 'Ativar tema escuro' : 'Ativar tema claro'"
+  :title="tema === 'claro' ? 'Ativar tema escuro' : 'Ativar tema claro'"
+>
+  {{ tema === 'claro' ? '🌙' : '☀️' }}
+  </button>
 
   <div v-if="menuAberto" class="dock-fundo" @click="fecharMenu"></div>
 
