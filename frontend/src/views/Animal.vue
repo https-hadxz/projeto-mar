@@ -91,11 +91,91 @@ async function removerModeracao() {
       class="foto-grande"
     />
 
-    <p><strong>Espécie:</strong> {{ animal.species }}</p>
-    <p v-if="animal.breed"><strong>Raça:</strong> {{ animal.breed }}</p>
-    <p v-if="animal.age !== null">
-      <strong>Idade:</strong> {{ animal.age }} {{ animal.age === 1 ? 'ano' : 'anos' }}
-    </p>
+  <h2>Identificação</h2>
+
+<p><strong>Espécie:</strong> {{ animal.species }}</p>
+<p><strong>Raça:</strong> {{ animal.breed }}</p>
+
+<p v-if="animal.scientificName">
+  <strong>Nome científico:</strong>
+  <i>{{ animal.scientificName }}</i>
+</p>
+
+<p v-if="animal.family">
+  <strong>Família:</strong> {{ animal.family }}
+</p>
+
+<p v-if="animal.age !== null">
+  <strong>Idade atual:</strong>
+  {{ animal.age }} {{ animal.age === 1 ? 'ano' : 'anos' }}
+</p>
+
+<h2>Características físicas</h2>
+
+<p v-if="animal.lifespan !== null">
+  <strong>Expectativa de vida média:</strong>
+  {{ animal.lifespan }} anos
+</p>
+
+<p v-if="animal.averageSize">
+  <strong>Tamanho médio:</strong> {{ animal.averageSize }}
+</p>
+
+<p v-if="animal.averageWeight">
+  <strong>Peso médio:</strong> {{ animal.averageWeight }}
+</p>
+
+<h2>Biologia e comportamento</h2>
+
+<template v-if="animal.diet">
+  <h3>Alimentação</h3>
+  <div class="conteudo">{{ animal.diet }}</div>
+</template>
+
+<template v-if="animal.habitat">
+  <h3>Habitat natural</h3>
+  <div class="conteudo">{{ animal.habitat }}</div>
+</template>
+
+<template v-if="animal.distribution">
+  <h3>Distribuição geográfica</h3>
+  <div class="conteudo">{{ animal.distribution }}</div>
+</template>
+
+<template v-if="animal.reproduction">
+  <h3>Reprodução</h3>
+  <div class="conteudo">{{ animal.reproduction }}</div>
+</template>
+
+<template v-if="animal.behavior">
+  <h3>Comportamento</h3>
+  <div class="conteudo">{{ animal.behavior }}</div>
+</template>
+
+<template v-if="animal.ecologicalRole">
+  <h3>Papel no ecossistema</h3>
+  <div class="conteudo">{{ animal.ecologicalRole }}</div>
+</template>
+
+<h2>Conservação</h2>
+
+<p v-if="animal.conservationStatus">
+  <strong>Estado de conservação:</strong>
+  {{ animal.conservationStatus }}
+</p>
+
+<template v-if="animal.threats">
+  <h3>Principais ameaças</h3>
+  <div class="conteudo">{{ animal.threats }}</div>
+</template>
+
+<template v-if="animal.curiosities">
+  <h3>Curiosidades</h3>
+  <div class="conteudo">{{ animal.curiosities }}</div>
+</template>
+
+<h2>Descrição geral</h2>
+<div class="conteudo">{{ animal.description }}</div>
 
     <h3>Descrição</h3>
     <div class="conteudo">{{ animal.description }}</div>
